@@ -1,18 +1,27 @@
 defmodule Calctorio do
   @moduledoc """
-  Documentation for Calctorio.
+  Computes ratios for Factorio recipes.  "How many machines producing iron gears do 
+  I need to support 10 machines producing red science?  What's the throughput of those 
+  ten machines?"
   """
 
   @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Calctorio.hello
-      :world
-
+  Computes the input rates of input items.
   """
-  def hello do
-    :world
+  def input_rates(recipe) do
+    recipe.inputs
+    |> Enum.map(fn {item, amount} -> 
+      {item, amount / recipe.time} 
+    end)
+  end
+
+  @doc """
+  Computes the output rates of output items.
+  """
+  def output_rates(recipe) do
+    recipe.outputs
+    |> Enum.map(fn {item, amount} -> 
+      {item, amount / recipe.time} 
+    end)
   end
 end
