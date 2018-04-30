@@ -45,4 +45,13 @@ defmodule Calctorio.AssemblyLine do
       lines: Enum.map(lines, &scale(&1, next_ratio))
     }
   end
+
+  def report(%AssemblyLine{ratio: ratio, root: root, lines: lines}, indent \\ "") do
+    lines_report =
+      lines
+      |> Enum.map(&report(&1, indent <> "  "))
+      |> Enum.join()
+
+    "#{indent}#{Calctorio.name(root)} #{ratio}\n" <> lines_report
+  end
 end
