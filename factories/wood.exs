@@ -1,32 +1,66 @@
-alias Calctorio.{AssemblyLine, Recipe}
+alias Calctorio.{AssemblyLine, Productivity, Recipe, Speed}
 
-wood_to_tar_and_petroleum = %Recipe{
-  inputs: [wood: 1],
-  outputs: [tar: 1, petroleum: 30],
-  time: 3
-}
+defmodule WoodAssemblyLine do
+  def foo do
+    %AssemblyLine{
+      root: wood_to_tar_and_petroleum(),
+      lines: [
+        %AssemblyLine{root: tar_to_solid_fuel()},
+        %AssemblyLine{root: petroleum_to_solid_fuel()}
+      ]
+    }
+  end
 
-tar_to_solid_fuel = %Recipe{
-  inputs: [tar: 1],
-  outputs: [solid_fuel: 1],
-  time: 5
-}
+  def s(recipe, multiplier) do
+    %Speed{
+      multiplier: multiplier,
+      recipe: recipe
+    }
+  end
 
-petroleum_to_solid_fuel = %Recipe{
-  inputs: [petroleum: 20],
-  outputs: [solid_fuel: 1],
-  time: 3
-}
+  def p(recipe, multiplier) do
+    %Productivity{
+      multiplier: multiplier,
+      recipe: recipe
+    }
+  end
 
-wood_to_solid_fuel = %AssemblyLine{
-  root: wood_to_tar_and_petroleum,
-  lines: [
-    %AssemblyLine{root: tar_to_solid_fuel},
-    %AssemblyLine{root: petroleum_to_solid_fuel}
-  ]
-}
+  def wood_to_tar_and_petroleum do
+    %Recipe{
+      inputs: [wood: 1],
+      outputs: [tar: 1, petroleum: 30],
+      # maybe in a %Machine{}?
+      crafting_speed: 1.25,
+      time: 3
+    }
+    |> s(8.75)
+  end
 
-wood_to_solid_fuel
+  def tar_to_solid_fuel do
+    %Recipe{
+      inputs: [tar: 1],
+      outputs: [solid_fuel: 1],
+      # maybe in a %Machine{}?
+      crafting_speed: 1.25,
+      time: 5
+    }
+    |> s(8.75)
+  end
+
+  def petroleum_to_solid_fuel do
+    %Recipe{
+      inputs: [petroleum: 20],
+      outputs: [solid_fuel: 1],
+      # maybe in a %Machine{}?
+      crafting_speed: 1.25,
+      time: 3
+    }
+    |> p(1.20)
+    |> s(6.75)
+  end
+end
+
+WoodAssemblyLine.foo()
 |> AssemblyLine.ratioize()
 |> AssemblyLine.report()
 |> IO.puts()
