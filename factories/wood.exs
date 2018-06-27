@@ -1,4 +1,4 @@
-alias Calctorio.{AssemblyLine, Productivity, Recipe, Speed}
+alias Calctorio.{AssemblyLine, Machine, Recipe}
 
 defmodule WoodAssemblyLine do
   def foo do
@@ -11,28 +11,25 @@ defmodule WoodAssemblyLine do
     }
   end
 
-  def s(recipe, multiplier) do
-    %Speed{
-      multiplier: multiplier,
-      recipe: recipe
-    }
+  def m(recipe) do
+    %Machine{recipe: recipe}
   end
 
-  def p(recipe, multiplier) do
-    %Productivity{
-      multiplier: multiplier,
-      recipe: recipe
-    }
+  def s(machine, multiplier) do
+    %{machine | speed: multiplier}
+  end
+
+  def p(machine, multiplier) do
+    %{machine | productivity: multiplier}
   end
 
   def wood_to_tar_and_petroleum do
     %Recipe{
       inputs: [wood: 1],
       outputs: [tar: 1, petroleum: 30],
-      # maybe in a %Machine{}?
-      crafting_speed: 1.25,
       time: 3
     }
+    |> m()
     |> s(8.75)
   end
 
@@ -40,10 +37,9 @@ defmodule WoodAssemblyLine do
     %Recipe{
       inputs: [tar: 1],
       outputs: [solid_fuel: 1],
-      # maybe in a %Machine{}?
-      crafting_speed: 1.25,
       time: 5
     }
+    |> m()
     |> s(8.75)
   end
 
@@ -51,10 +47,9 @@ defmodule WoodAssemblyLine do
     %Recipe{
       inputs: [petroleum: 20],
       outputs: [solid_fuel: 1],
-      # maybe in a %Machine{}?
-      crafting_speed: 1.25,
       time: 3
     }
+    |> m()
     |> p(1.20)
     |> s(6.75)
   end

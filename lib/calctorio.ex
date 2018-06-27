@@ -6,38 +6,33 @@ defmodule Calctorio do
 
   ## Examples
 
-          iex> alias Calctorio.{Productivity, Recipe, Speed}
+          iex> alias Calctorio.{Machine, Recipe}
           iex> iron_plates =
-          ...>  %Productivity{
-          ...>    multiplier: 1.4,
-          ...>    recipe: %Speed{
-          ...>      multiplier: 5.575,
-          ...>      recipe: %Recipe{
-          ...>        inputs: [iron_ore: 1],
-          ...>        outputs: [iron_plate: 1],
-          ...>        time: 3
-          ...>      }
-          ...>    }
-          ...>  }
+          ...>   %Machine{
+          ...>     productivity: 1.4,
+          ...>     speed: 5.575,
+          ...>     recipe: %Recipe{
+          ...>       inputs: [iron_ore: 1],
+          ...>       outputs: [iron_plate: 1],
+          ...>       time: 3
+          ...>     }
+          ...>   }
           iex> gears =
-          ...>  %Productivity{
-          ...>    multiplier: 1.4,
-          ...>    recipe: %Speed{
-          ...>      multiplier: 5.575,
-          ...>      recipe: %Recipe{
-          ...>        inputs: [iron_plate: 1],
-          ...>        outputs: [gear: 2],
-          ...>        time: 0.5
-          ...>      }
-          ...>    }
-          ...>  }
+          ...>   %Machine{
+          ...>     productivity: 1.4,
+          ...>     speed: 5.575,
+          ...>     recipe: %Recipe{
+          ...>       inputs: [iron_plate: 1],
+          ...>       outputs: [gear: 2],
+          ...>       time: 0.5
+          ...>     }
+          ...>   }
           iex> Calctorio.output_rates(iron_plates)
           [iron_plate: 2.6016666666666666]
           iex> Calctorio.input_rates(gears)
           [iron_plate: 11.15]
           iex> Calctorio.machine_ratio(:iron_plate, iron_plates, gears)
           0.2333333333333333
-
 
   iron_ore_to_gears =
     %Progression{
@@ -51,7 +46,7 @@ defmodule Calctorio do
   }
   """
 
-  alias Calctorio.{AssemblyLine, Productivity, Recipe}
+  alias Calctorio.{AssemblyLine, Machine, Recipe}
 
   def name(%AssemblyLine{}), do: {:error, "assembly lines have no name"}
 
@@ -87,15 +82,11 @@ defmodule Calctorio do
     end)
   end
 
-  def input_rates(%Productivity{recipe: recipe}) do
-    input_rates(recipe)
-  end
-
-  def input_rates(%{recipe: recipe, multiplier: multiplier}) do
+  def input_rates(%Machine{recipe: recipe, speed: speed}) do
     recipe
     |> input_rates()
     |> Enum.map(fn {item, amount} ->
-      {item, amount * multiplier}
+      {item, amount * speed}
     end)
   end
 
@@ -108,11 +99,11 @@ defmodule Calctorio do
     end)
   end
 
-  def output_rates(%{recipe: recipe, multiplier: multiplier}) do
+  def output_rates(%Machine{recipe: recipe, speed: speed, productivity: productivity}) do
     recipe
     |> output_rates()
     |> Enum.map(fn {item, amount} ->
-      {item, amount * multiplier}
+      {item, amount * speed * productivity}
     end)
   end
 end

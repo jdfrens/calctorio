@@ -4,7 +4,7 @@ defmodule CalctorioTest do
 
   doctest Calctorio
 
-  alias Calctorio.{AssemblyLine, Productivity, Recipe, Speed}
+  alias Calctorio.{AssemblyLine, Machine, Recipe}
 
   describe ".name" do
     test "assembly line with many inputs" do
@@ -17,21 +17,14 @@ defmodule CalctorioTest do
       assert Calctorio.name(r) == "x,y,z => a,b"
     end
 
-    test "speed punts to recipe" do
-      s = %Speed{
+    test "machine punts to recipe" do
+      m = %Machine{
         recipe: build_recipe(%{inputs: [x: 20], outputs: [a: 9]}),
-        multiplier: 1.0
+        speed: 100_000.0,
+        productivity: 99_999.9
       }
 
-      assert Calctorio.name(s) == "x => a"
-    end
-
-    test "productivity punts to recipe" do
-      p = %Productivity{
-        recipe: build_recipe(%{inputs: [x: 20], outputs: [a: 9]})
-      }
-
-      assert Calctorio.name(p) == "x => a"
+      assert Calctorio.name(m) == "x => a"
     end
   end
 
@@ -46,21 +39,14 @@ defmodule CalctorioTest do
       assert Calctorio.input_items(r) == [:x, :y, :z]
     end
 
-    test "speed with many inputs" do
-      s = %Speed{
+    test "machine with many inputs" do
+      m = %Machine{
         recipe: build_recipe(%{inputs: [x: 20, y: 13, z: 5]}),
-        multiplier: 1.0
+        speed: 10.0,
+        productivity: 99.9
       }
 
-      assert Calctorio.input_items(s) == [:x, :y, :z]
-    end
-
-    test "productivity with many inputs" do
-      p = %Productivity{
-        recipe: build_recipe(%{inputs: [x: 20, y: 13, z: 5]})
-      }
-
-      assert Calctorio.input_items(p) == [:x, :y, :z]
+      assert Calctorio.input_items(m) == [:x, :y, :z]
     end
   end
 
@@ -70,20 +56,14 @@ defmodule CalctorioTest do
       assert Calctorio.output_items(r) == [:a, :b, :c]
     end
 
-    test "speed with many outputs" do
-      s = %Speed{
-        recipe: build_recipe(%{outputs: [a: 20, b: 13, c: 5]})
+    test "machine with many outputs" do
+      m = %Machine{
+        recipe: build_recipe(%{outputs: [a: 20, b: 13, c: 5]}),
+        speed: 10.0,
+        productivity: 99.9
       }
 
-      assert Calctorio.output_items(s) == [:a, :b, :c]
-    end
-
-    test "productivity with many outputs" do
-      p = %Productivity{
-        recipe: build_recipe(%{outputs: [a: 20, b: 13, c: 5]})
-      }
-
-      assert Calctorio.output_items(p) == [:a, :b, :c]
+      assert Calctorio.output_items(m) == [:a, :b, :c]
     end
   end
 
@@ -93,22 +73,34 @@ defmodule CalctorioTest do
       assert Calctorio.input_rates(r) == [x: 2, y: 1.3, z: 0.5]
     end
 
-    test "speed with recipe with many inputs" do
-      s = %Speed{
+    test "machine with speed" do
+      m = %Machine{
         recipe: build_recipe(%{inputs: [x: 20, y: 13, z: 5]}),
-        multiplier: 2.0
+        speed: 2.0,
+        productivity: 1.0
       }
 
-      assert Calctorio.input_rates(s) == [x: 40.0, y: 26.0, z: 10.0]
+      assert Calctorio.input_rates(m) == [x: 40.0, y: 26.0, z: 10.0]
     end
 
-    test "IGNORE productivity with recipe with many inputs" do
-      s = %Productivity{
+    test "machine with productivity which is ignored" do
+      m = %Machine{
         recipe: build_recipe(%{inputs: [x: 20, y: 13, z: 5]}),
-        multiplier: 2.0
+        speed: 1.0,
+        productivity: 2.0
       }
 
-      assert Calctorio.input_rates(s) == [x: 20.0, y: 13.0, z: 5.0]
+      assert Calctorio.input_rates(m) == [x: 20.0, y: 13.0, z: 5.0]
+    end
+
+    test "machine with speed and productivity" do
+      m = %Machine{
+        recipe: build_recipe(%{inputs: [x: 20, y: 13, z: 5]}),
+        speed: 2.0,
+        productivity: 100.0
+      }
+
+      assert Calctorio.input_rates(m) == [x: 40.0, y: 26.0, z: 10.0]
     end
   end
 
@@ -119,21 +111,33 @@ defmodule CalctorioTest do
     end
 
     test "speed with recipe with many outputs" do
-      s = %Speed{
+      m = %Machine{
         recipe: build_recipe(%{outputs: [x: 20, y: 13, z: 5]}),
-        multiplier: 3.0
+        speed: 3.0,
+        productivity: 1.0
       }
 
-      assert Calctorio.output_rates(s) == [x: 60.0, y: 39.0, z: 15.0]
+      assert Calctorio.output_rates(m) == [x: 60.0, y: 39.0, z: 15.0]
     end
 
     test "productivity with recipe with many outputs" do
-      s = %Productivity{
+      m = %Machine{
         recipe: build_recipe(%{outputs: [x: 20, y: 13, z: 5]}),
-        multiplier: 3.0
+        speed: 1.0,
+        productivity: 3.0
       }
 
-      assert Calctorio.output_rates(s) == [x: 60.0, y: 39.0, z: 15.0]
+      assert Calctorio.output_rates(m) == [x: 60.0, y: 39.0, z: 15.0]
+    end
+
+    test "speed and productivity" do
+      m = %Machine{
+        recipe: build_recipe(%{outputs: [x: 20, y: 13, z: 5]}),
+        speed: 5.0,
+        productivity: 3.0
+      }
+
+      assert Calctorio.output_rates(m) == [x: 300.0, y: 195.0, z: 75.0]
     end
   end
 end

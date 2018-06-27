@@ -3,7 +3,7 @@ defmodule Calctorio.AssemblyLine do
   Represents an assembly line.
   """
 
-  alias Calctorio.AssemblyLine
+  alias Calctorio.{AssemblyLine, Machine}
 
   defstruct root: nil, lines: [], ratio: nil
 
