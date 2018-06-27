@@ -4,4 +4,10 @@ defmodule Calctorio.Recipe do
   """
 
   defstruct inputs: [], outputs: [], time: 0.0
+
+  @type t :: %__MODULE__{
+          inputs: keyword,
+          outputs: keyword,
+          time: float
+        }
 end

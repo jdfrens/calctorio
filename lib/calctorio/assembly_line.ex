@@ -7,6 +7,13 @@ defmodule Calctorio.AssemblyLine do
 
   defstruct root: nil, lines: [], ratio: nil
 
+  @type t :: %__MODULE__{
+          root: Machine.t(),
+          lines: list(AssemblyLine.t()),
+          ratio: float | nil
+        }
+
+  @spec common_item(Calctorio.Machine.t(), Calctorio.Machine.t()) :: atom
   def common_item(first, second) do
     outputs = first |> Calctorio.output_items() |> MapSet.new()
     inputs = second |> Calctorio.input_items() |> MapSet.new()
@@ -18,6 +25,7 @@ defmodule Calctorio.AssemblyLine do
     end
   end
 
+  @spec ratioize(AssemblyLine.t()) :: AssemblyLine.t()
   def ratioize(%AssemblyLine{lines: []} = assembly_line) do
     %{assembly_line | ratio: 1.0}
   end
@@ -36,6 +44,7 @@ defmodule Calctorio.AssemblyLine do
     })
   end
 
+  @spec scale(AssemblyLine.t(), float) :: AssemblyLine.t()
   def scale(%AssemblyLine{root: root, ratio: ratio, lines: lines}, running_ratio \\ 1.0) do
     next_ratio = ratio * running_ratio
 
@@ -46,6 +55,7 @@ defmodule Calctorio.AssemblyLine do
     }
   end
 
+  @spec report(AssemblyLine.t(), String.t()) :: String.t()
   def report(%AssemblyLine{ratio: ratio, root: root, lines: lines}, indent \\ "") do
     lines_report =
       lines

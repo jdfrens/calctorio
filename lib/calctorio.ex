@@ -48,6 +48,10 @@ defmodule Calctorio do
 
   alias Calctorio.{AssemblyLine, Machine, Recipe}
 
+  @type t :: AssemblyLine.t() | Machine.t() | Recipe.t()
+  @type item :: atom
+
+  @spec name(Calctorio.t()) :: String.t() | {:error, String.t()}
   def name(%AssemblyLine{}), do: {:error, "assembly lines have no name"}
 
   def name(%Recipe{inputs: inputs, outputs: outputs}) do
@@ -60,22 +64,26 @@ defmodule Calctorio do
     name(recipe)
   end
 
+  @spec machine_ratio(Calctorio.item(), Calctorio.t(), Calctorio.t()) :: float
   def machine_ratio(item, recipe1, recipe2) do
     output_rate = recipe1 |> output_rates() |> Keyword.fetch!(item)
     input_rate = recipe2 |> input_rates() |> Keyword.fetch!(item)
     output_rate / input_rate
   end
 
+  @spec input_items(Calctorio.t()) :: [Calctorio.item()]
   def input_items(%AssemblyLine{root: root}), do: input_items(root)
   def input_items(%Recipe{inputs: inputs}), do: Keyword.keys(inputs)
   def input_items(%{recipe: recipe}), do: input_items(recipe)
 
+  @spec output_items(Calctorio.t()) :: [Calctorio.item()]
   def output_items(%Recipe{outputs: outputs}), do: Keyword.keys(outputs)
   def output_items(%{recipe: recipe}), do: output_items(recipe)
 
   @doc """
   Computes the input rates of input items.
   """
+  @spec input_rates(Calctorio.t()) :: Keyword.t({Calctorio.item(), float})
   def input_rates(%Recipe{inputs: inputs, time: time}) do
     Enum.map(inputs, fn {item, amount} ->
       {item, amount / time}
@@ -93,6 +101,7 @@ defmodule Calctorio do
   @doc """
   Computes the output rates of output items.
   """
+  @spec output_rates(Calctorio.t()) :: Keyword.t({Calctorio.item(), float})
   def output_rates(%Recipe{outputs: outputs, time: time}) do
     Enum.map(outputs, fn {item, amount} ->
       {item, amount / time}
